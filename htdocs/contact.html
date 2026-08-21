@@ -154,34 +154,41 @@
         </div>
       </div>
 
-      <!-- Form Card -->
+      <!-- Form Card (Updated with Web3Forms action) -->
       <div class="contact-form-card reveal-right">
         <h3>Send Us a Message</h3>
         <p>Fill in the form below and our team will respond within 24 hours with a free consultation.</p>
-        <form class="contact-form" novalidate>
+        
+        <form class="contact-form" action="https://api.web3forms.com/submit" method="POST">
+          <!-- Web3Forms Configuration -->
+          <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE"/>
+          <input type="hidden" name="subject" value="New Inquiry from HRS Website"/>
+          <input type="hidden" name="from_name" value="HRS Website Contact Form"/>
+          <input type="checkbox" name="botcheck" class="hidden" style="display:none;"/>
+
           <div class="form-row">
             <div class="form-group">
               <label for="fname">First Name *</label>
-              <input type="text" id="fname" name="fname" placeholder="Your first name" required/>
+              <input type="text" id="fname" name="First_Name" placeholder="Your first name" required/>
             </div>
             <div class="form-group">
               <label for="lname">Last Name</label>
-              <input type="text" id="lname" name="lname" placeholder="Your last name"/>
+              <input type="text" id="lname" name="Last_Name" placeholder="Your last name"/>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="phone">Phone Number *</label>
-              <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" required/>
+              <input type="tel" id="phone" name="Phone_Number" placeholder="+91 XXXXX XXXXX" required/>
             </div>
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" placeholder="your@email.com"/>
+              <input type="email" id="email" name="Email_Address" placeholder="your@email.com"/>
             </div>
           </div>
           <div class="form-group">
             <label for="service">Project Type *</label>
-            <select id="service" name="service" required>
+            <select id="service" name="Project_Type" required>
               <option value="">-- Select Project Type --</option>
               <option>Residential House / Villa</option>
               <option>Apartment Complex</option>
@@ -197,7 +204,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="budget">Approximate Budget</label>
-              <select id="budget" name="budget">
+              <select id="budget" name="Budget_Range">
                 <option value="">-- Select Budget Range --</option>
                 <option>Below ₹20 Lakhs</option>
                 <option>₹20 – ₹50 Lakhs</option>
@@ -208,16 +215,16 @@
             </div>
             <div class="form-group">
               <label for="area">Project Area (sqft)</label>
-              <input type="text" id="area" name="area" placeholder="e.g. 2500 sqft"/>
+              <input type="text" id="area" name="Project_Area" placeholder="e.g. 2500 sqft"/>
             </div>
           </div>
           <div class="form-group">
             <label for="location">Project Location</label>
-            <input type="text" id="location" name="location" placeholder="Area / locality in Coimbatore"/>
+            <input type="text" id="location" name="Location" placeholder="Area / locality in Coimbatore"/>
           </div>
           <div class="form-group">
             <label for="message">Project Details *</label>
-            <textarea id="message" name="message" placeholder="Tell us about your project – type of building, number of floors, special requirements..." required></textarea>
+            <textarea id="message" name="Project_Details" placeholder="Tell us about your project – type of building, number of floors, special requirements..." required></textarea>
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;font-size:16px;padding:16px;">Send Message & Get Free Quote</button>
           <p style="font-size:12px;color:var(--gray-500);margin-top:12px;text-align:center;">We typically respond within 2–4 hours during business hours.</p>

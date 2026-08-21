@@ -184,15 +184,15 @@
             <label for="service">Project Type *</label>
             <select id="service" name="service" required>
               <option value="">-- Select Project Type --</option>
-              <option>Residential House / Villa</option>
-              <option>Apartment Complex</option>
-              <option>Commercial Office Building</option>
-              <option>Industrial / Warehouse</option>
-              <option>Turnkey Construction</option>
-              <option>Interior Design</option>
-              <option>Renovation / Remodeling</option>
-              <option>Structural Engineering</option>
-              <option>Other</option>
+              <option value="Residential House / Villa">Residential House / Villa</option>
+              <option value="Apartment Complex">Apartment Complex</option>
+              <option value="Commercial Office Building">Commercial Office Building</option>
+              <option value="Industrial / Warehouse">Industrial / Warehouse</option>
+              <option value="Turnkey Construction">Turnkey Construction</option>
+              <option value="Interior Design">Interior Design</option>
+              <option value="Renovation / Remodeling">Renovation / Remodeling</option>
+              <option value="Structural Engineering">Structural Engineering</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div class="form-row">
@@ -200,11 +200,11 @@
               <label for="budget">Approximate Budget</label>
               <select id="budget" name="budget">
                 <option value="">-- Select Budget Range --</option>
-                <option>Below ₹20 Lakhs</option>
-                <option>₹20 – ₹50 Lakhs</option>
-                <option>₹50 Lakhs – ₹1 Crore</option>
-                <option>₹1 – ₹5 Crore</option>
-                <option>Above ₹5 Crore</option>
+                <option value="Below ₹20 Lakhs">Below ₹20 Lakhs</option>
+                <option value="₹20 – ₹50 Lakhs">₹20 – ₹50 Lakhs</option>
+                <option value="₹50 Lakhs – ₹1 Crore">₹50 Lakhs – ₹1 Crore</option>
+                <option value="₹1 – ₹5 Crore">₹1 – ₹5 Crore</option>
+                <option value="Above ₹5 Crore">Above ₹5 Crore</option>
               </select>
             </div>
             <div class="form-group">
@@ -221,7 +221,7 @@
             <textarea id="message" name="message" placeholder="Tell us about your project – type of building, number of floors, special requirements..." required></textarea>
           </div>
           <button type="submit" id="submitBtn" class="btn btn-primary" style="width:100%;justify-content:center;font-size:16px;padding:16px;">Send Message & Get Free Quote</button>
-          <div id="formStatus" style="display:none;margin-top:14px;text-align:center;font-weight:600;font-size:14px;"></div>
+          <div id="formStatus" style="display:none;margin-top:14px;text-align:center;font-weight:600;font-size:14px;padding:10px;border-radius:6px;"></div>
           <p style="font-size:12px;color:var(--gray-500);margin-top:12px;text-align:center;">We typically respond within 2–4 hours during business hours.</p>
         </form>
       </div>
@@ -363,84 +363,110 @@
 <style>.nav { background: rgba(10,22,40,0.96); backdrop-filter: blur(20px); }</style>
 <script src="js/main.js"></script>
 
-<!-- SUPABASE & WEB3FORMS DUAL INTEGRATION SCRIPT -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- SUPABASE DIRECT REST & WEB3FORMS SCRIPT -->
 <script>
-  const SUPABASE_URL = "https://ynrdmvaadprdhufcwqya.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_i3Bd1zp2Z1amS0Ys05VHPw_iSDuMage";
-  const WEB3FORMS_ACCESS_KEY = "13de9c67-ffc1-40a1-bbef-4bf2b4030fea";
+  document.addEventListener("DOMContentLoaded", function() {
+    const contactForm = document.getElementById('hrsContactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formStatus = document.getElementById('formStatus');
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_URL = "https://ynrdmvaadprdhufcwqya.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_i3Bd1zp2Z1amS0Ys05VHPw_iSDuMage";
+    const WEB3FORMS_KEY = "13de9c67-ffc1-40a1-bbef-4bf2b4030fea";
 
-  const contactForm = document.getElementById('hrsContactForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const formStatus = document.getElementById('formStatus');
+    contactForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-  contactForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+      formStatus.style.display = "none";
 
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Submitting...";
-    formStatus.style.display = "none";
-
-    const formData = {
-      first_name: document.getElementById('fname').value.trim(),
-      last_name: document.getElementById('lname').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      project_type: document.getElementById('service').value,
-      budget_range: document.getElementById('budget').value,
-      project_area: document.getElementById('area').value.trim(),
-      location: document.getElementById('location').value.trim(),
-      message: document.getElementById('message').value.trim()
-    };
-
-    try {
-      // 1. Supabase Database Insert
-      const { error: dbError } = await supabaseClient
-        .from('contact_inquiries')
-        .insert([formData]);
-
-      if (dbError) {
-        console.error("Supabase Error:", dbError);
-      }
-
-      // 2. Web3Forms Email Submission
-      const emailPayload = {
-        access_key: WEB3FORMS_ACCESS_KEY,
-        subject: "New Inquiry from HRS Website",
-        from_name: "HRS Engineers Contact Form",
-        ...formData
+      const payload = {
+        first_name: document.getElementById('fname').value.trim(),
+        last_name: document.getElementById('lname').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        project_type: document.getElementById('service').value,
+        budget_range: document.getElementById('budget').value,
+        project_area: document.getElementById('area').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        message: document.getElementById('message').value.trim()
       };
 
-      const emailResponse = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(emailPayload)
-      });
+      let isSupabaseSuccess = false;
+      let isEmailSuccess = false;
 
-      const emailResult = await emailResponse.json();
+      // 1. Send to Supabase via Direct REST API
+      try {
+        const sbResponse = await fetch(`${SUPABASE_URL}/rest/v1/contact_inquiries`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify(payload)
+        });
 
-      if (emailResult.success || !dbError) {
+        if (sbResponse.ok) {
+          isSupabaseSuccess = true;
+          console.log("Supabase insert success");
+        } else {
+          const errText = await sbResponse.text();
+          console.error("Supabase REST Error:", errText);
+        }
+      } catch (sbErr) {
+        console.error("Supabase Fetch Error:", sbErr);
+      }
+
+      // 2. Send to Web3Forms (Email)
+      try {
+        const emailPayload = {
+          access_key: WEB3FORMS_KEY,
+          subject: "New Inquiry from HRS Website",
+          from_name: "HRS Website Contact Form",
+          ...payload
+        };
+
+        const mailResponse = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(emailPayload)
+        });
+
+        const mailResult = await mailResponse.json();
+        if (mailResult.success) {
+          isEmailSuccess = true;
+          console.log("Web3Forms email success");
+        } else {
+          console.error("Web3Forms Error:", mailResult);
+        }
+      } catch (mailErr) {
+        console.error("Web3Forms Fetch Error:", mailErr);
+      }
+
+      // Response UI Feedback
+      if (isSupabaseSuccess || isEmailSuccess) {
         formStatus.style.display = "block";
+        formStatus.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
         formStatus.style.color = "#10b981";
         formStatus.innerText = "Thank you! Your message has been sent successfully. We will contact you soon.";
         contactForm.reset();
       } else {
-        throw new Error("Submission failed");
+        formStatus.style.display = "block";
+        formStatus.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+        formStatus.style.color = "#ef4444";
+        formStatus.innerText = "Submission failed. Please call us directly at +91 86818 30730.";
       }
-    } catch (err) {
-      console.error(err);
-      formStatus.style.display = "block";
-      formStatus.style.color = "#ef4444";
-      formStatus.innerText = "Something went wrong. Please call us directly at +91 86818 30730.";
-    } finally {
+
       submitBtn.disabled = false;
       submitBtn.innerText = "Send Message & Get Free Quote";
-    }
+    });
   });
 </script>
 </body>

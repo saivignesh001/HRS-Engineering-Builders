@@ -152,12 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const cfg = window.HRS_CONFIG || {};
-      const configured =
+      const supabaseConfigured =
         cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('YOUR_') &&
-        cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('YOUR_') &&
+        cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('YOUR_');
+      const web3formsConfigured =
         cfg.WEB3FORMS_ACCESS_KEY && !cfg.WEB3FORMS_ACCESS_KEY.includes('YOUR_');
 
-      if (!configured) {
+      if (!supabaseConfigured && !web3formsConfigured) {
         console.error('HRS_CONFIG is not set up yet — edit js/config.js with your Supabase and Web3Forms keys.');
         errorBox.textContent = 'Form is not fully set up yet. Please call or WhatsApp us instead.';
         errorBox.style.display = 'block';
@@ -170,47 +171,51 @@ document.addEventListener('DOMContentLoaded', () => {
       let emailOk = false;
 
       // 1) Save to Supabase
-      try {
-        const res = await fetch(`${cfg.SUPABASE_URL}/rest/v1/contact_submissions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': cfg.SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${cfg.SUPABASE_ANON_KEY}`,
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify(data),
-        });
-        supabaseOk = res.ok;
-        if (!res.ok) console.error('Supabase insert failed:', await res.text());
-      } catch (err) {
-        console.error('Supabase insert error:', err);
+      if (supabaseConfigured) {
+        try {
+          const res = await fetch(`${cfg.SUPABASE_URL}/rest/v1/contact_submissions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': cfg.SUPABASE_ANON_KEY,
+              'Authorization': `Bearer ${cfg.SUPABASE_ANON_KEY}`,
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify(data),
+          });
+          supabaseOk = res.ok;
+          if (!res.ok) console.error('Supabase insert failed:', await res.text());
+        } catch (err) {
+          console.error('Supabase insert error:', err);
+        }
       }
 
       // 2) Send email via Web3Forms
-      try {
-        const res = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            access_key: cfg.WEB3FORMS_ACCESS_KEY,
-            subject: `New Enquiry from HRS Website – ${data.first_name} ${data.last_name}`,
-            from_name: 'HRS Engineers & Builders Website',
-            name: `${data.first_name} ${data.last_name}`,
-            email: data.email || 'not provided',
-            phone: data.phone,
-            project_type: data.project_type,
-            budget: data.budget,
-            area_sqft: data.area_sqft,
-            location: data.location,
-            message: data.message,
-          }),
-        });
-        const json = await res.json();
-        emailOk = res.ok && json.success;
-        if (!emailOk) console.error('Web3Forms send failed:', json);
-      } catch (err) {
-        console.error('Web3Forms send error:', err);
+      if (web3formsConfigured) {
+        try {
+          const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              access_key: cfg.WEB3FORMS_ACCESS_KEY,
+              subject: `New Enquiry from HRS Website – ${data.first_name} ${data.last_name}`,
+              from_name: 'HRS Engineers & Builders Website',
+              name: `${data.first_name} ${data.last_name}`,
+              email: data.email || 'not provided',
+              phone: data.phone,
+              project_type: data.project_type,
+              budget: data.budget,
+              area_sqft: data.area_sqft,
+              location: data.location,
+              message: data.message,
+            }),
+          });
+          const json = await res.json();
+          emailOk = res.ok && json.success;
+          if (!emailOk) console.error('Web3Forms send failed:', json);
+        } catch (err) {
+          console.error('Web3Forms send error:', err);
+        }
       }
 
       if (supabaseOk || emailOk) {
